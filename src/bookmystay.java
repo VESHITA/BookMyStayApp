@@ -1,66 +1,87 @@
 import java.util.*;
 
-class AddonService {
-    private String serviceName;
-    private double cost;
+class Reservation {
 
-    public AddonService(String serviceName, double cost) {
-        this.serviceName = serviceName;
-        this.cost = cost;
+    private String customerName;
+    private String roomType;
+    private int nights;
+
+    public Reservation(String customerName, String roomType, int nights) {
+        this.customerName = customerName;
+        this.roomType = roomType;
+        this.nights = nights;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public double getCost() {
-        return cost;
+    public String toString() {
+        return "Customer: " + customerName + ", Room: " + roomType + ", Nights: " + nights;
     }
 }
 
-class AddonServiceManager {
-    private Map<String, List<AddonService>> servicesByReservation;
+class BookingHistory {
 
-    public AddonServiceManager() {
-        servicesByReservation = new HashMap<>();
+    private List<Reservation> confirmedReservations;
+
+    public BookingHistory() {
+        confirmedReservations = new ArrayList<>();
     }
 
-    public void addService(String reservationId, AddonService service) {
-        if (!servicesByReservation.containsKey(reservationId)) {
-            servicesByReservation.put(reservationId, new ArrayList<>());
-        }
-        servicesByReservation.get(reservationId).add(service);
+    public void addReservation(Reservation reservation) {
+        confirmedReservations.add(reservation);
     }
 
-    public double calculateTotalServiceCost(String reservationId) {
-        if (!servicesByReservation.containsKey(reservationId)) {
-            return 0.0;
+    public List<Reservation> getConfirmedReservations() {
+        return confirmedReservations;
+    }
+}
+
+class BookingReportService {
+
+    public void generateReport(BookingHistory history) {
+
+        System.out.println("\n===== BOOKING REPORT =====");
+
+        if (history.getConfirmedReservations().isEmpty()) {
+            System.out.println("No bookings available.");
+            return;
         }
 
-        double total = 0.0;
-        for (AddonService s : servicesByReservation.get(reservationId)) {
-            total += s.getCost();
+        for (Reservation r : history.getConfirmedReservations()) {
+            System.out.println(r);
         }
-        return total;
+
+        System.out.println("Total Bookings: " + history.getConfirmedReservations().size());
     }
 }
 
 public class bookmystay {
+
     public static void main(String[] args) {
-        AddonServiceManager manager = new AddonServiceManager();
 
-        AddonService breakfast = new AddonService("Breakfast", 20.0);
-        AddonService spa = new AddonService("Spa", 50.0);
-        AddonService pickup = new AddonService("Airport Pickup", 30.0);
+        Scanner sc = new Scanner(System.in);
+        BookingHistory history = new BookingHistory();
 
-        String reservationId = "R001";
+        System.out.print("Enter number of reservations: ");
+        int n = sc.nextInt();
+        sc.nextLine();
 
-        manager.addService(reservationId, breakfast);
-        manager.addService(reservationId, spa);
-        manager.addService(reservationId, pickup);
+        for (int i = 1; i <= n; i++) {
 
-        double total = manager.calculateTotalServiceCost(reservationId);
+            System.out.println("\nReservation " + i);
 
-        System.out.println("Total Add-on Service Cost: " + total);
+            System.out.print("Enter customer name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter room type: ");
+            String room = sc.nextLine();
+
+            System.out.print("Enter number of nights: ");
+            int nights = sc.nextInt();
+            sc.nextLine();
+
+            history.addReservation(new Reservation(name, room, nights));
+        }
+
+        BookingReportService reportService = new BookingReportService();
+        reportService.generateReport(history);
     }
 }
